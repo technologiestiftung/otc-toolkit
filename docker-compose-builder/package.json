@@ -1,0 +1,140 @@
+{
+  "name": "otc-dco",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "scripts": {
+    "start": "node dist/cli.js -o ./",
+    "test": "jest",
+    "dev": "nodemon",
+    "ts:node:module": "ts-node src/index.ts",
+    "ts:node:cli": "ts-node src/cli.ts",
+    "ts:watch": "tsc -p . -w",
+    "ts:build": "tsc -p .",
+    "build": "npm run ts:build"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "8.2.0",
+    "meow": "^6.1.0",
+    "yaml": "^1.9.2"
+  },
+  "devDependencies": {
+    "ts-node": "^8.9.0",
+    "@types/jest": "25.2.1",
+    "@types/morgan": "1.9.0",
+    "@types/node": "13.13.1",
+    "@typescript-eslint/eslint-plugin": "2.29.0",
+    "@typescript-eslint/parser": "2.29.0",
+    "cz-conventional-changelog": "3.1.0",
+    "eslint": "6.8.0",
+    "eslint-config-prettier": "6.10.1",
+    "eslint-plugin-jest": "23.8.2",
+    "jest": "25.4.0",
+    "nodemon": "2.0.3",
+    "prettier": "2.0.4",
+    "ts-jest": "25.4.0",
+    "typescript": "3.8.3"
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "jest-environment-node",
+    "testPathIgnorePatterns": [
+      "node_modules/",
+      "<rootDir>/dist"
+    ]
+  },
+  "nodemonConfig": {
+    "ignore": [
+      "**/*.test.ts",
+      "**/*.spec.ts",
+      ".git",
+      "node_modules/**/node_modules"
+    ],
+    "watch": [
+      "./src"
+    ],
+    "exec": "./node_modules/.bin/tsc -p . && node -r dotenv/config --inspect dist/index.js",
+    "ext": "ts,json",
+    "restartable": "rs",
+    "verbose": true,
+    "env": {
+      "NODE_ENV": "development",
+      "NODE_DOCKER_ENV": "0"
+    }
+  },
+  "prettier": {
+    "printWidth": 80,
+    "semi": true,
+    "singleQuote": false
+  },
+  "renovate": {
+    "extends": [
+      "config:base"
+    ],
+    "packageRules": [
+      {
+        "updateTypes": [
+          "minor",
+          "patch",
+          "pin",
+          "digest"
+        ],
+        "automerge": true
+      }
+    ]
+  },
+  "eslintConfig": {
+    "ignorePatterns": [
+      "node_modules",
+      "dist",
+      "coverage"
+    ],
+    "env": {
+      "jest/globals": true
+    },
+    "root": true,
+    "parser": "@typescript-eslint/parser",
+    "plugins": [
+      "@typescript-eslint",
+      "jest"
+    ],
+    "extends": [
+      "eslint:recommended",
+      "plugin:@typescript-eslint/eslint-recommended",
+      "plugin:@typescript-eslint/recommended",
+      "prettier/@typescript-eslint",
+      "plugin:jest/recommended"
+    ],
+    "rules": {
+      "@typescript-eslint/no-unused-vars": [
+        "warn",
+        {
+          "args": "after-used",
+          "varsIgnorePattern": "^_",
+          "argsIgnorePattern": "^_"
+        }
+      ]
+    }
+  },
+  "lint-staged": {
+    "**/*.+(js|jsx|ts|tsx)": [
+      "eslint --fix"
+    ],
+    "**/*.+(js|jsx|json|yml|yaml|css|scss|ts|tsx|md)": [
+      "prettier --write"
+    ]
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm t && npm run lint-staged"
+    }
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  }
+}

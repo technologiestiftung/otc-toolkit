@@ -1,0 +1,46 @@
+version: "3.4"
+
+services:
+  #  mongoku:
+  # image: huggingface/mongoku
+  # ports:
+  #   - "3100:3100"
+  # environment:
+  #   MONGO_URL: mongodb://mongo:27017/local
+  #   MONGOCLIENT_USERNAME: root
+  #   MONGOCLIENT_PASSWORD: example
+
+  # mongo-express:
+  #   image: mongo-express
+  #   restart: always
+  #   ports:
+  #     - 8081:8081
+  #   environment:
+  #     ME_CONFIG_MONGODB_ADMINUSERNAME: root
+  #     ME_CONFIG_MONGODB_ADMINPASSWORD: example
+  mongodb: # Don't change this unless you know what you are doing
+    image: mongo
+    restart: always
+    ports:
+      - "27018:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+  opendatacam:
+    image: opendatacam/opendatacam:v3.0.0-beta.1-nano
+    container_name: opendatacam
+    restart: unless-stopped
+    privileged: true
+    volumes:
+      - "./config.json:/opendatacam/config.json" # Don't change this unless you know what you are doin
+      - "./opendatacam_videos:/darknet/opendatacam_videos:ro" # Don't change this unless you know what you are doin
+      - "/usr/lib/aarch64-linux-gnu/tegra-egl:/usr/lib/aarch64-linux-gnu/tegra-egl:ro" # Don't change this unless you know what you are doin
+      - "/usr/lib/aarch64-linux-gnu/tegra:/usr/lib/aarch64-linux-gnu/tegra:ro" # Don't change this unless you know what you are doin
+      - "/etc/ld.so.cache:/etc/ld.so.cache:ro" # Don't change this unless you know what you are doin
+      - "/etc/alternatives:/etc/alternatives:ro" # Don't change this unless you know what you are doin
+      - "/etc/nvidia:/etc/nvidia:ro" # Don't change this unless you know what you are doin
+      - "/var/nvidia:/var/nvidia:ro" # Don't change this unless you know what you are doin
+      - "/var/cuda-repo-10-0-local:/var/cuda-repo-10-0-local:ro" # Don't change this unless you know what you are doin
+      - "/usr/local/cuda:/usr/local/cuda:ro" # Don't change this unless you know what you are doin
+      - "/usr/local/cuda-10.0:/usr/local/cuda-10.0:ro" # Don't change this unless you know what you are doin
+
