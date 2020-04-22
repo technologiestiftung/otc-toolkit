@@ -10,5 +10,3 @@ find /usr/lib/aarch64-linux-gnu -name libGL* 2> /dev/null | perl -pe 's/(.*)/  -
 find /etc -name *cuda* 2> /dev/null | perl -pe 's/(.*)/  - "$1:$1:ro"/' >> templates/res.yml
 find /etc -name *cudnn* 2> /dev/null | perl -pe 's/(.*)/  - "$1:$1:ro"/' >> templates/res.yml
 find /etc -name nv* 2> /dev/null | perl -pe 's/(.*)/  - "$1:$1:ro"/' >> templates/res.yml
-
-IFS='+*+'
