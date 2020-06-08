@@ -70,22 +70,6 @@
     "semi": true,
     "singleQuote": false
   },
-  "renovate": {
-    "extends": [
-      "config:base"
-    ],
-    "packageRules": [
-      {
-        "updateTypes": [
-          "minor",
-          "patch",
-          "pin",
-          "digest"
-        ],
-        "automerge": true
-      }
-    ]
-  },
   "eslintConfig": {
     "ignorePatterns": [
       "node_modules",
