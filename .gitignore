@@ -180,3 +180,7 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+
+# directories withrecordings
+
+recording/2020-*
