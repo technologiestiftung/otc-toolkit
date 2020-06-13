@@ -1,0 +1,8 @@
+#Crontab commands
+
+*/30 11-23 * * 5-6 sh /home/otc-xavier/recording/start_odc.sh ; sleep 60; sh /home/otc-xavier/recording/init_odc.sh ; sleep 10 ; sh /home/otc-xavier/recording/start_odc_recording.sh ; sleep 10 ; sh /home/otc$
+
+*/30 0-16 * * 6 sh /home/otc-xavier/recording/start_odc.sh ; sleep 60; sh /home/otc-xavier/recording/init_odc.sh ; sleep 10 ; sh /home/otc-xavier/recording/start_odc_recording.sh ; sleep 10 ; sh /home/otc-x$
+
+
+
