@@ -1,7 +1,7 @@
 import requests
 
 URL = "http://localhost:8080/counter/areas"
-params =
+params = 
 {
         "countingAreas": {
           "5287124a-4598-44e7-abaf-394018a7278b": {
@@ -25,5 +25,6 @@ params =
           }
         }
       }
+
 #params = {"point1": {"x": 221, "y": 300}}, "point2": {"x": 400, "y": 200}, "refResolution": {"w": 640, "h": 360},"Direction": "bidirectional"}
 r = requests.post(URL, data=params)
