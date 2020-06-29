@@ -1,4 +1,7 @@
 #!/usr/bin/env python3.7
 
 import requests
-r = requests.get("http://localhost:8080/recording/start")
+try:
+  r = requests.get("http://localhost:8080/recording/start")
+except Exception as e:
+  print(e)
