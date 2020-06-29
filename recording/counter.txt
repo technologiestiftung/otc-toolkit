@@ -1,0 +1,22 @@
+"countingAreas": {
+          "5287124a-4598-44e7-abaf-394018a7278b": {
+            "color": "yellow",
+            "location": {
+              "point1": {
+                "x": 221,
+                "y": 588
+              },
+              "point2": {
+                "x": 673,
+                "y": 546
+              },
+              "refResolution": {
+                "w": 640,
+                "h": 360
+              }
+            },
+            "name": "Counter line 1"
+            "type": "bidirectional"
+          }
+        }
+      }
