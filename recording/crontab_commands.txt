@@ -1,6 +1,6 @@
-#Crontab commands
+# Crontab commands
 
-*/30 * * * * sh /home/otc-xavier/otc-toolkit/recording/record.sh
+*/30 * * * * /path/to/otc-toolkit/recording/record.sh /absolute/path/to/the/folder/of/docker-compose-yml/ /absolute/path/where/the/recordings/should/be/stored
 
 
 
