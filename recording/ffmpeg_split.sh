@@ -9,6 +9,9 @@ function main() {
     last_recordings=$(ls ./*.mp4)
     for entry in $last_recordings; do
         NAME=$(echo "$entry" | cut -d'.' -f1) # get name of mp4-file without ending
+        echo "$entry - should be the mp4 filename"
+        echo "$NAME - should be foldername"
+
         mkdir "$NAME"
         mv "$entry" "$NAME"
         mv "${NAME}_tracker.json" "$NAME"
