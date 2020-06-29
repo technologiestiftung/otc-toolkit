@@ -20,14 +20,17 @@ try:
     # Get _id of the last recording
     recordings = requests.get(
         "http://localhost:8080/recordings", params={"limit": 1})
+    print("GET recordings", recordings.status_code)
     recordings = recordings.json()
     recording_id = recordings["recordings"][0]["_id"]
     # Get tracker data for the last recording
     tracker_data = requests.get(
         "http://localhost:8080/recording/" + recording_id + "/tracker")
+    print("GET tracker_data", tracker_data.status_code)
 # Get counter data
     counter_data = requests.get(
         "http://localhost:8080/recording/" + recording_id + "/counter")
+    print("GET counter_data", counter_data.status_code)
     # get name of last mp4 file
     mp4_files = glob("*.mp4")
     mp4_files = sorted(mp4_files, reverse=True)
