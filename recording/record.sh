@@ -1,31 +1,46 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
+IFS=$'\n\t'
 
-#sh /home/otc-xavier/otc-toolkit/recording/start_odc.sh
 
-#sleep 60;
+# This script wants as arguments
+# $1    first argument is the path
+#       to the folder containing the docker-compose.yml
+# $2    second argument is the folder
+#       where the recordings get stored
 
-python3 /home/otc-xavier/otc-toolkit/recording/init_odc.py
+#
+function main() {
 
-sleep 10
+  ./start_odc.sh "$1"
 
-python3 /home/otc-xavier/otc-toolkit/recording/start_odc_recording.py
+  sleep 60
 
-sleep 10
+  python3.7 ./init_odc.py
 
-sh /home/otc-xavier/otc-toolkit/recording/ffmpeg_recording.sh
+  sleep 10
 
-sleep 30
+  python3.7 ./start_odc_recording.py
 
-python3 /home/otc-xavier/otc-toolkit/recording/stop_odc_recording.py
+  sleep 10
 
-sleep 5
+  ./ffmpeg_recording.sh "$2"
 
-python3 /home/otc-xavier/otc-toolkit/recording/download_tracker_data.py
+  sleep 30
 
-sleep 5
+  python3.7 ./stop_odc_recording.py
 
-sh /home/otc-xavier/otc-toolkit/recording/ffmpeg_split.sh
+  sleep 5
 
-#sleep 60
+  python3.7 ./download_tracker_data.py "$2"
 
-#sh /home/otc-xavier/otc-toolkit/recording/stop_odc.sh
+  sleep 5
+
+  ./ffmpeg_split.sh "$2"
+
+  sleep 60
+
+  ./stop_odc.sh "$1"
+
+}
+main "$1" "$2"

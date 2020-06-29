@@ -1,16 +1,16 @@
-#!/bin/sh
+#!/usr/bin/env bash
+set -euo pipefail
+IFS=$'\n\t'
 
-#Start recording
-#echo "recording starting now"
-cd /home/otc-xavier/otc-toolkit/recording
+# espects as argument the folder where the recordings are stored
+function main() {
+  #Start recording
+  #echo "recording starting now"
+  cd "$1"
 
-#ffmpeg -use_wallclock_as_timestamps 1 -f mjpeg -i "http://localhost:8080/webcam/stream" -vf "scale=320:-1" -c:v copy -t 00:00:10 -y $(date "+%Y-%m-%d-%H-%M-%S-%6N").mp4
-ffmpeg -use_wallclock_as_timestamps 1 -f mjpeg -i "http://localhost:8080/webcam/stream" -t 00:00:10 -c:v copy -y $(date "+%Y-%m-%d-%H-%M-%S-%6N").mp4
-#ffmpeg -use_wallclock_as_timestamps 1 -f mjpeg -i "http://localhost:8080/webcam/stream" -filter_complex "[0:v]scale=640/2:-1[v]" -map "[v]" -map 0:a -c:a copy  -t 00:00:10 -y $(date "+%Y-%m-%d-%H-%M-%S-%6N").mp4
+  FILENAME="$(date '+%Y-%m-%d-%H-%M-%S-%6N')"
+  ffmpeg -use_wallclock_as_timestamps 1 -f mjpeg -i "http://localhost:8080/webcam/stream" -t 00:00:10 -c:v copy -y "${FILENAME}.mp4"
 
-#sleep 10
-#echo "recording done"
+}
 
-#Check duration Change time
-#ffmpeg -i test7.mp4 -c copy -f null -
-
+main "$1"

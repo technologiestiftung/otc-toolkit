@@ -1,6 +1,12 @@
-#!/bin/sh
-cd /home/otc-xavier/opendatacam
+#!/usr/bin/env bash
+set -euo pipefail
+IFS=$'\n\t'
+# This script expexts the path to the docker-compose setup
+# as first argument
 
-#Stop ODC - use pm2 to run in the background
-pm2 stop server.js 
+function main() {
+  cd "$1"
+  docker-compose stop
+}
 
+main "$1"
