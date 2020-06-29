@@ -8,7 +8,10 @@ function main() {
     cd "$1"
     last_recordings=$(ls ./*.mp4)
     for entry in $last_recordings; do
-        NAME=$(echo "$entry" | cut -d'.' -f1) # get name of mp4-file without ending
+        filename=$(basename -- "$entry")
+        # extension="${filename##*.}"
+        NAME="${filename%.*}"
+        # NAME=$(echo "$entry" | cut -d'.' -f1) # get name of mp4-file without ending
         echo "$entry - should be the mp4 filename"
         echo "$NAME - should be foldername"
 
