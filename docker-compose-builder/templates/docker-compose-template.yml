@@ -1,37 +1,76 @@
-version: "3.4"
+version: "3.8"
 
 services:
-  #  mongoku:
-  # image: huggingface/mongoku
-  # ports:
-  #   - "3100:3100"
-  # environment:
-  #   MONGO_URL: mongodb://mongo:27017/local
-  #   MONGOCLIENT_USERNAME: root
-  #   MONGOCLIENT_PASSWORD: example
-
-  # mongo-express:
-  #   image: mongo-express
-  #   restart: always
-  #   ports:
-  #     - 8081:8081
-  #   environment:
-  #     ME_CONFIG_MONGODB_ADMINUSERNAME: root
-  #     ME_CONFIG_MONGODB_ADMINPASSWORD: example
-  mongodb: # Don't change this unless you know what you are doing
-    image: mongo
+  mongo: # Don't change this unless you know what you are doing
+    image: mongo:4.2.6
+    hostname: mongo
+    container_name: mongo
     restart: always
-    ports:
-      - "27018:27017"
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: example
+    # entrypoint: ["mongod"]
+    # command: ["--bind_ip_all", "--replSet", "rs0", "--quiet"]
+    volumes:
+      # - "./mongodb/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d"
+      - "/data/opendatacam-external/db:/data/db"
+    ports:
+      - "27017:27017"
+  # a pretty mongo viewer/client
+  mongoku:
+    image: technologiestiftung/mongoku:arm64-jetson-nano-v0.1.0
+    # build:
+    #   context: ./mongoku
+    #   dockerfile: Dockerfile
+    ports:
+      - 3100:3100
+    environment:
+      MONGOKU_DEFAULT_HOST: mongodb://root:example@mongo:27017
+    depends_on:
+      - mongo
+      - opendatacam
+  # a not so pretty mongo viewer/client
+  # but with more features
+  mongo-express:
+    image: mongo-express
+    restart: always
+    ports:
+      - 8888:8081
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: example
+    depends_on:
+      - mongo
+      - opendatacam
+  # https://github.com/gliderlabs/logspout
+  # had to build this on the nano for arm64
+  logspout:
+    container_name: logspout
+    hostname: logspout
+    image: technologiestiftung/logspout:arm64-jetson-nano-v3.2.8
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    # access data on this port curl http://127.0.0.1:9999/logs
+    ports:
+      - 9999:80
+    environment:
+      # allows us to ignore specific containers
+      LOGSPOUT: ignore
+      EXCLUDE_LABEL: logspout.exclude
+    # allows http access to the logstream usung curl
+    # see https://github.com/gliderlabs/logspout/tree/master/httpstream
   opendatacam:
     image: opendatacam/opendatacam:v3.0.0-beta.1-nano
     container_name: opendatacam
     restart: unless-stopped
     privileged: true
+    ports:
+      - "8080:8080"
+      - "8090:8090"
+      - "8070:8070"
+      # - "27017:27017" # lets expose the mongoDB
     volumes:
+      - "/data/opendatacam/db:/data/db"
       - "./config.json:/opendatacam/config.json" # Don't change this unless you know what you are doin
       - "./opendatacam_videos:/darknet/opendatacam_videos:ro" # Don't change this unless you know what you are doin
       - "/usr/lib/aarch64-linux-gnu/tegra-egl:/usr/lib/aarch64-linux-gnu/tegra-egl:ro" # Don't change this unless you know what you are doin
