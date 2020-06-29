@@ -1,6 +1,10 @@
-# Recording 
+# Recording
 
+## Install dependencies
 
+```bash
+pip install -r requirements.txt
+```
 
 ## Notes from the LAB
 
