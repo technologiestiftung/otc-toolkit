@@ -25,15 +25,23 @@ pm2 stop otc
 
 ## Record.sh Script
 
+The scripts needs sudo rights to run the `docker-compose start` command
 
-tbd
+Arguments:
+
+- $1 path to the folder with the docker-compose.yml
+- $2 path to where the recordings are stored
+- $3 path to where the scripts are stored (e.g. otc-toolkit/recording)
+- $4 path to where the archives should be moved
 
 ## Crontab Example
 
 Note: Don't add a trailing slash to the paths
+Note: To make docker-compose availalbe we need to add the roots users `$PATH` to the crontab
 
 ```bash
-*/30 * * * * /path/to/otc-toolkit/recording/record.sh /absolute/path/to/the/folder/of/docker-compose-yml/ /absolute/path/where/the/recordings/should/be/stored /absolute/path/where/the/scripts/of/otc-toolkit/recording/is >> /path/to/where/you/want/the/logs/cron.log 2>&1
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games
+*/30 * * * * /path/to/otc-toolkit/recording/record.sh /absolute/path/to/the/folder/of/docker-compose-yml /absolute/path/where/the/recordings/should/be/stored /absolute/path/where/the/scripts/of/otc-toolkit/recording/is /absolute/path/where/the/archives/should/be/moved/to/at/the/end > /path/to/where/you/want/the/logs/cron.log 2>&1
 ```
 
 
