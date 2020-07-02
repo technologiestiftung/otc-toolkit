@@ -47,6 +47,14 @@ PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/us
 
 ## Useful Shell Commands
 
+See content of zip archive
+
 ```bash
 zip –sf <archive_name>
+```
+
+See content of file while there is written to it (follow logs)
+
+```bash
+tail -F path/to/cron.log
 ```
