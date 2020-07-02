@@ -23,3 +23,18 @@ pm2 stop otc
 
 ```
 
+## Record.sh Script
+
+
+tbd
+
+## Crontab Example
+
+Note: Don't add a trailing slash to the paths
+
+```bash
+*/30 * * * * /path/to/otc-toolkit/recording/record.sh /absolute/path/to/the/folder/of/docker-compose-yml/ /absolute/path/where/the/recordings/should/be/stored /absolute/path/where/the/scripts/of/otc-toolkit/recording/is >> /path/to/where/you/want/the/logs/cron.log 2>&1
+```
+
+
+
