@@ -44,6 +44,12 @@ PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/us
 */30 * * * * /path/to/otc-toolkit/recording/record.sh /absolute/path/to/the/folder/of/docker-compose-yml /absolute/path/where/the/recordings/should/be/stored /absolute/path/where/the/scripts/of/otc-toolkit/recording/is /absolute/path/where/the/archives/should/be/moved/to/at/the/end > /path/to/where/you/want/the/logs/cron.log 2>&1
 ```
 
+An example crontab for a nano is like the following
+```bash
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games
+*/30 * * * * /home/otc-admin/otc/otc-toolkit/recording/record.sh /home/otc-admin/otc /home/otc-admin/otc-recordings /home/otc-admin/otc/otc-toolkit/recording /home/otc-admin/tmp > /home/otc-admin/otc-recordings/cron.log 2>&1
+
+```
 
 ## Useful Shell Commands
 
