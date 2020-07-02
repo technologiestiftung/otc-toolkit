@@ -3,6 +3,6 @@
 import requests
 try:
   r = requests.get("http://localhost:8080/recording/start")
-  print(r.status_code)
+  print("GET Start recording", r.status_code)
 except Exception as e:
   print(e)
