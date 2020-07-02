@@ -8,9 +8,11 @@ IFS=$'\n\t'
 #       to the folder containing the docker-compose.yml
 # $2    second argument is the folder
 #       where the recordings get stored
-
+# $3    Is the path where the record.sh is stored
 #
 function main() {
+
+  cd "$3"
 
   ./start_odc.sh "$1"
 
@@ -43,4 +45,4 @@ function main() {
   ./stop_odc.sh "$1"
 
 }
-main "$1" "$2"
+main "$1" "$2" "$3"
