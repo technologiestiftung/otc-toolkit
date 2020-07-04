@@ -36,8 +36,20 @@ Arguments:
 
 ## Crontab Example
 
+For the Docker based setup (in our case Nano and Xavier) you need to edit the crontab of the `root` user.
+
+```bash
+sudo crontab -e
+```
+
+For bare metal Node.js setups (TX2 in our case)
+
+```bash
+crontab  -e
+```
+
 Note: Don't add a trailing slash to the paths
-Note: To make docker-compose availalbe we need to add the roots users `$PATH` to the crontab
+Note: To make docker-compose available we need to add the roots users `$PATH` to the crontab
 
 ```bash
 PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games
@@ -63,4 +75,14 @@ See content of file while there is written to it (follow logs)
 
 ```bash
 tail -F path/to/cron.log
+```
+
+If the boards are connected to a wifi or wired connection you should be able to log into them using ssh
+
+```bash
+ssh otc-admin@otc-nano.local
+
+ssh otc-admin@otc-tx2-1.local
+
+ssh otc-admin@otc-xavier.local
 ```
