@@ -1,19 +1,9 @@
 # Setup Nano
 
-- flash nano
+- flash nano (see instructions [here](https://developer.nvidia.com/embedded/learn/get-started-jetson-nano-devkit#write))
 - login to nano
   This might help [finding the nano in the local network](https://apple.stackexchange.com/questions/310061/how-to-find-all-devices-ip-address-hostname-mac-address-on-local-network)
   
-- set hostname
-
-```bash
-# https://linuxize.com/post/how-to-change-hostname-on-ubuntu-18-04/githu
-hostnamectl
-sudo hostnamectl set-hostname NEWHOSTNAME
-# Open the /etc/hosts file and change the old hostname to the new one.
-sudo vim /etc/hosts
-```
-
 - install openssh
 - enable openssh
 
@@ -39,6 +29,16 @@ cat ~/.ssh/id_rsa.pub
 # login to otcboter gituhb account
 # copy paste into new key
 # name it based on hostname
+```
+
+- set hostname
+
+```bash
+# https://linuxize.com/post/how-to-change-hostname-on-ubuntu-18-04/githu
+hostnamectl
+sudo hostnamectl set-hostname NEWHOSTNAME
+# Open the /etc/hosts file and change the old hostname to the new one.
+sudo vim /etc/hosts
 ```
 
 - install zsh
