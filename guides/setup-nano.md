@@ -30,7 +30,12 @@ cat ~/.ssh/id_rsa.pub
 # copy paste into new key
 # name it based on hostname
 ```
+- add git user name and email if you want to make changes and push them
 
+```bash
+git config --global user.name "otcboter"
+git config --global user.email "roboter@opentrafficcount.de"
+```
 - set hostname
 
 ```bash
