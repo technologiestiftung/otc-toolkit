@@ -33,9 +33,16 @@ cat ~/.ssh/id_rsa.pub
 # name it based on hostname
 ```
 
+- add git user name and email if you want to make changes and push them
 - create authorized_keys file
 - add own ssh pub key to it
 - watch out for permissions [see](https://superuser.com/a/1559867)
+
+```bash
+git config --global user.name "otcboter"
+git config --global user.email "roboter@opentrafficcount.de"
+```
+
 - set hostname
 
 ```bash
@@ -48,6 +55,7 @@ sudo vim /etc/hosts
 
 - install zsh
 - install curl
+- install ffmpeg
 
 ```bash
 sudo apt-get update && sudo apt-get install zsh curl
