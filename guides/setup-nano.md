@@ -1,8 +1,7 @@
 # Setup Nano
 
 - flash nano (see instructions [here](https://developer.nvidia.com/embedded/learn/get-started-jetson-nano-devkit#write))
-- login to nano
-  This might help [finding the nano in the local network](https://apple.stackexchange.com/questions/310061/how-to-find-all-devices-ip-address-hostname-mac-address-on-local-network)
+- login to nano using the GUI
   
 - install openssh
 - enable openssh
@@ -14,6 +13,9 @@ sudo systemctl status ssh
 sudo systemctl enable ssh
 sudo systemctl start ssh
 ```
+
+- login to nano over ssh 
+  This might help [finding the nano in the local network](https://apple.stackexchange.com/questions/310061/how-to-find-all-devices-ip-address-hostname-mac-address-on-local-network)
 
 - create ssh key
 - add ssh key to GitHub otcboter
@@ -31,6 +33,9 @@ cat ~/.ssh/id_rsa.pub
 # name it based on hostname
 ```
 
+- create authorized_keys file
+- add own ssh pub key to it
+- watch out for permissions [see](https://superuser.com/a/1559867)
 - set hostname
 
 ```bash
