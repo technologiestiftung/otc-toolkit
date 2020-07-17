@@ -53,12 +53,12 @@ sudo hostnamectl set-hostname NEWHOSTNAME
 sudo vim /etc/hosts
 ```
 
-- install zsh
-- install curl
-- install ffmpeg
+- install zsh (optional)
+- install curl (optional)
+- install ffmpeg (NOT optional)
 
 ```bash
-sudo apt-get update && sudo apt-get install zsh curl
+sudo apt-get update && sudo apt-get install -y zsh curl ffmpeg
 ```
 
 - install oh-my-zsh
