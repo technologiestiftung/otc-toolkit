@@ -17,7 +17,7 @@ function main() {
   echo "Timestamp: $TIMESTAMP"
   cd "$3"
 
-  ./start_odc.sh "$1"
+  ./start_odc.sh -p "tx2" "$1"
 
   sleep 60
 
@@ -45,7 +45,7 @@ function main() {
 
   sleep 60
 
-  ./stop_odc.sh "$1"
+  ./stop_odc.sh -p "tx2" "$1"
 
   sleep 5
 
