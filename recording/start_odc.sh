@@ -35,7 +35,7 @@ function main() {
     docker-compose start
   elif [[ "$PLATFORM" == "tx2" ]]; then
     echo "running with pm2 on bare metal"
-    pm2 start opendatacam
+    pm2 start /home/otc-admin/otc/otc-toolkit/ecosystem.config.js 
   else
    print_usage;
    exit 1;
