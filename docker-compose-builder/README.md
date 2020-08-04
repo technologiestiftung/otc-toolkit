@@ -1,5 +1,6 @@
 # Opendatacam docker-compose.yml Builder
 
+Note: This is deprecated work. ODC switched to a docker-compose setup. Only the additional containers and the mongo as replica-set is relevant. The docker-compose generating process is not needed anymore. Needs clenaup @fabianmonronzirfas
 This is a small tool for generating `docker-compose.yml` and `docker-compose.overrides.yml`. The current process of setting up the volumnes that should be accesable for the opendatacam image and starting the container is not extendable enough. This tool takes some parts of [the script `run-docker.sh`](https://raw.githubusercontent.com/opendatacam/opendatacam/master/docker/run-jetson/run-docker.sh) and packs them up in a docker-compose setup.
 
 ## Prerequisites

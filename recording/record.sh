@@ -1,31 +1,55 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
+IFS=$'\n\t'
 
-#sh /home/otc-xavier/otc-toolkit/recording/start_odc.sh
 
-#sleep 60;
+# This script wants as arguments
+# $1    first argument is the path
+#       to the folder containing the docker-compose.yml
+# $2    second argument is the folder
+#       where the recordings get stored
+# $3    Is the path where the record.sh is stored
+# $4    the path to the folder (or drive) where the zip archives
+#       should be moved
+#
+function main() {
+  TIMESTAMP="$(date '+%Y-%m-%d-%H-%M-%S-%6N')"
+  echo "Timestamp: $TIMESTAMP"
+  cd "$3"
 
-python3 /home/otc-xavier/otc-toolkit/recording/init_odc.py
+  ./start_odc.sh "$1"
 
-sleep 10
+  sleep 60
 
-python3 /home/otc-xavier/otc-toolkit/recording/start_odc_recording.py
+  /usr/bin/python3.7 ./init_odc.py
 
-sleep 10
+  sleep 10
 
-sh /home/otc-xavier/otc-toolkit/recording/ffmpeg_recording.sh
+  /usr/bin/python3.7 ./start_odc_recording.py
 
-sleep 30
+  sleep 10
 
-python3 /home/otc-xavier/otc-toolkit/recording/stop_odc_recording.py
+  ./ffmpeg_recording.sh "$2"
 
-sleep 5
+  sleep 30
 
-python3 /home/otc-xavier/otc-toolkit/recording/download_tracker_data.py
+  /usr/bin/python3.7 ./stop_odc_recording.py
 
-sleep 5
+  sleep 5
 
-sh /home/otc-xavier/otc-toolkit/recording/ffmpeg_split.sh
+  /usr/bin/python3.7 ./download_tracker_data.py "$2"
 
-#sleep 60
+  sleep 5
 
-#sh /home/otc-xavier/otc-toolkit/recording/stop_odc.sh
+  ./ffmpeg_split.sh "$2"
+
+  sleep 60
+
+  ./stop_odc.sh "$1"
+
+  sleep 5
+
+  ./archive-recordings.sh "$2" "$4"
+
+}
+main "$1" "$2" "$3" "$4"

@@ -1,7 +1,0 @@
-#Crontab commands
-
-*/30 * * * * sh /home/otc-xavier/otc-toolkit/recording/record.sh
-
-
-
-
