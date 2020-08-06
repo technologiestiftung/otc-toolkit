@@ -77,6 +77,10 @@ if __name__ == '__main__':
 
         tracker_data = pd.read_json(join(PATH_TO_RECORDINGS, rec, rec + "_tracker.json"))
 
+        """use below if you want to to join on frames instead of timestamps"""
+        #########
+        tracker_data.drop_duplicates(subset=["frameId"], inplace=True, ignore_index=True)
+        #########
         tracker_data = reduce_tracker_json(tracker_data, ffmpeg_start_time, len(images))
 
         merged = merge(tracker_data, images)
