@@ -11,7 +11,7 @@ function main() {
 
   FILENAME="$(date '+%Y-%m-%d-%H-%M-%S-%6N')"
   echo "creating file $FILENAME"
-  ffmpeg -use_wallclock_as_timestamps 1 -f mjpeg -i "http://localhost:8080/webcam/stream" -t 00:00:10 -c:v copy -y "$1/$FILENAME.mp4"
+  ffmpeg -use_wallclock_as_timestamps 1 -f mjpeg -i "http://localhost:8080/webcam/stream" -t 00:00:30 -c:v copy -y "$1/$FILENAME.mp4"
 
 }
 
