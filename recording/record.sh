@@ -27,11 +27,11 @@ function main() {
 
   /usr/bin/python3.7 ./start_odc_recording.py
 
-  sleep 10
+ # sleep 10
 
   ./ffmpeg_recording.sh "$2"
 
-  sleep 30
+  # sleep 30
 
   /usr/bin/python3.7 ./stop_odc_recording.py
 
