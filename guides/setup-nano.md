@@ -55,10 +55,11 @@ sudo vim /etc/hosts
 
 - install zsh (optional)
 - install curl (optional)
+- install exfat-fuse exfat-utils
 - install ffmpeg (NOT optional)
 
 ```bash
-sudo apt-get update && sudo apt-get install -y zsh curl ffmpeg
+sudo apt-get update && sudo apt-get install -y zsh curl ffmpeg exfat-fuse exfat-utils
 ```
 
 - install oh-my-zsh
@@ -156,4 +157,15 @@ sudo crontab -e
 # takes you into vim
 PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games
 */30 * * * * /home/otc-admin/otc/toolkit/recording/record.sh /home/otc-admin/otc/opendatacam /home/otc-admin/otc/recordings /home/otc-admin/otc/toolkit/recording /home/otc-admin/otc/tmp > /home/otc-admin/otc/recordings/cron.log 2>&1
+```
+
+To mount an exfat usb drive you will need to:
+
+```bash
+# Identify the drive by fs type and size
+sudo fdisk -l
+# create a folder where you can mount it
+sudo mkdir /media/usb-drive
+# mount the drive to the new folder 
+sudo mount /dev/sda1 /media/usb-drive
 ```
