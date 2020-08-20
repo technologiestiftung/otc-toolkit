@@ -88,7 +88,7 @@ PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/us
 # recreates all services after boot
 @reboot pm2 resurrect
 
-*/30 * * * * /home/otc-admin/otc/toolkit/recording/record.sh /home/otc-admin/otc/opendatacam /home/otc-admin/otc/recordings /home/otc-admin/otc/toolkit/recording /home/otc-admin/otc/tmp > /home/otc-admin/otc/recordings/cron.log 2>&1
+0,30 * * * * /home/otc-admin/otc/toolkit/recording/record.sh /home/otc-admin/otc/opendatacam /home/otc-admin/otc/recordings /home/otc-admin/otc/toolkit/recording /home/otc-admin/otc/tmp > /home/otc-admin/otc/recordings/cron.log 2>&1
 ```
 
 If you done everything right you will have zip files in the tmp folder, cron.log in the recordings folder.
