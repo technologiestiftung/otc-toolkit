@@ -156,7 +156,7 @@ sudo echo $PATH
 sudo crontab -e
 # takes you into vim
 PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games
-*/30 * * * * /home/otc-admin/otc/toolkit/recording/record.sh /home/otc-admin/otc/opendatacam /home/otc-admin/otc/recordings /home/otc-admin/otc/toolkit/recording /home/otc-admin/otc/tmp > /home/otc-admin/otc/recordings/cron.log 2>&1
+0,30 * * * * /home/otc-admin/otc/toolkit/recording/record.sh /home/otc-admin/otc/opendatacam /home/otc-admin/otc/recordings /home/otc-admin/otc/toolkit/recording /home/otc-admin/otc/tmp > /home/otc-admin/otc/recordings/cron.log 2>&1
 ```
 
 To mount an exfat usb drive you will need to:
