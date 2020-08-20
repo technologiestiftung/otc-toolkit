@@ -162,6 +162,8 @@ PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/us
 To mount an exfat usb drive you will need to:
 
 ```bash
+# install tools to enable exfat filesystems
+sudo apt-get install exfat-fuse exfat-utils
 # Identify the drive by fs type and size
 sudo fdisk -l
 # create a folder where you can mount it
