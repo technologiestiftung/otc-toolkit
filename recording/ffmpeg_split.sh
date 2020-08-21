@@ -19,9 +19,9 @@ function main() {
         mv "$entry" "$NAME"
         mv "${NAME}_tracker.json" "$NAME"
         mv "${NAME}_counter.json" "$NAME"
-        cd "$NAME"
-        ffmpeg -i "$entry" "${NAME}_%03d.png"
-        cd ..
+        # cd "$NAME"
+        # ffmpeg -i "$entry" "${NAME}_%03d.png"
+        # cd ..
     done
 
 }
