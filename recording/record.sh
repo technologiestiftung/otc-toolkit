@@ -43,7 +43,7 @@ function main() {
 
   ./ffmpeg_split.sh "$2"
 
-  sleep 60
+  sleep 5
 
   ./stop_odc.sh "$1"
 
