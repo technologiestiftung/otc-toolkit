@@ -22,6 +22,13 @@ pm2 start otc
 pm2 stop otc
 
 ```
+## Define valid/ detectable classes
+
+By default, ODC tries to detect all classes form the COCO dataset on which YOLO was trained. However, certain classes such as moving bicycles are often detected as persons, which is why we recommend to focus on the relvant classes only.
+
+Thus, in `config.json` replace 
+
+`"VALID_CLASSES": [*]` by `"VALID_CLASSES: ["bus", "car", "bicycle", "truck", "motorbike"]`.
 
 ## Record.sh Script
 
