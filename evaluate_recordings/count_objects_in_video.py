@@ -7,8 +7,9 @@ Creates a CSV file for evaluation of ODC countings.
 4. TODO: add columns for luminosity, day/night, weather
 """
 
-# TODO: add argparse for: delay, ???
+# TODO: activate sampling later
 
+import argparse
 import json
 
 import ffmpeg
@@ -29,12 +30,18 @@ CLASSES = ["car", "person", "truck", "bicycle", "bus", "motorbike"]
 FINAL_COLS = ["movie_file", "direction", "ODC_car", "car", "ODC_person", "person", "ODC_truck", "truck", "ODC_bicycle",
               "bicycle", "ODC_bus", "bus", "ODC_motorbike", "motorbike"]
 
+parser = argparse.ArgumentParser(description='Prepare file for evaluation of ODC counts')
+parser.add_argument('-d', '--delay', type=int, default=250,
+                    help='number of milliseconds to add as delay to ODC records')
 
-def load_counter_history(file_path, delay=0):
+args = parser.parse_args()
+
+
+def load_counter_history(file_path):
     data = json.load(open(file_path))
     df = pd.DataFrame(data["counterHistory"])
     df["timestamp"] = pd.to_datetime(df["timestamp"])
-    df["timestamp"] = df["timestamp"] + datetime.timedelta(milliseconds=delay)
+    df["timestamp"] = df["timestamp"] + datetime.timedelta(milliseconds=args.delay)
     return df
 
 
@@ -52,6 +59,8 @@ def postproces_odc_counting_cols(df):
     df = df.rename({"level_0": "movie_file", "level_1": "direction"}, axis="columns")
     df = df.fillna(value={c: 0 for c in CLASSES})
     for c in CLASSES:
+        if c not in df.columns:
+            df[c] = 0
         df[c] = df[c].astype(int)
     return df.rename({c: "ODC_" + c for c in CLASSES}, axis="columns")
 
@@ -100,4 +109,4 @@ if __name__ == "__main__":
 
     RESULTS = postproces_odc_counting_cols(RESULTS)
     RESULTS = add_eval_cols(RESULTS)
-    RESULTS[FINAL_COLS].to_csv("store_recordings.csv") # TODO: better name, different format?
+    RESULTS[FINAL_COLS].to_csv("store_recordings.csv")  # TODO: better name, different format?
