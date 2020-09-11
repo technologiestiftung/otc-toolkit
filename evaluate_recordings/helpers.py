@@ -9,12 +9,11 @@ import ffmpeg
 #     bashCommand = "ffmpeg -skip_frame nokey -i " + v + " -vsync 0 -frame_pts true -r 1000 hw%d.png"
 #     output = subprocess.check_output(['bash', '-c', bashCommand])
 
-def split_video_into_images(folder):
-    v = join(folder, folder + ".mp4")
+def split_video_into_images(video_file, path_for_images):
     try:
-        (ffmpeg.input(v)
+        (ffmpeg.input(video_file)
          .filter('fps', fps=2)
-         .output(join(folder, '%d.png'),
+         .output(join(path_for_images, '%d.png'),
                  video_bitrate='5000k',
                  sws_flags='bilinear',
                  start_number=0)
@@ -24,5 +23,5 @@ def split_video_into_images(folder):
         print('stderr:', e.stderr.decode('utf8'))
 
 
-if __name__ == '__main__':
-    split_video_into_images("2020-08-16-08-31-14-497963")
+def build_file_path_for_countings(station, board):
+    return '_'.join(['ODC_counts', station, board, '.csv'])

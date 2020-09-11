@@ -18,6 +18,7 @@ import pandas as pd
 import pytz
 
 from config import *
+from helpers import build_file_path_for_countings
 
 utc = pytz.utc
 from datetime import datetime as dt
@@ -33,7 +34,10 @@ FINAL_COLS = ["movie_file", "direction", "ODC_car", "car", "ODC_person", "person
 parser = argparse.ArgumentParser(description='Prepare file for evaluation of ODC counts')
 parser.add_argument('-d', '--delay', type=int, default=250,
                     help='number of milliseconds to add as delay to ODC records')
-
+parser.add_argument('--station', type=str, required=True, choices=STATIONS,
+                    help='one of our two stations')
+parser.add_argument('--board', type=str, required=True, choices=['nano', 'tx2', 'xavier'],
+                    help='type of board')
 args = parser.parse_args()
 
 
@@ -109,4 +113,5 @@ if __name__ == "__main__":
 
     RESULTS = postproces_odc_counting_cols(RESULTS)
     RESULTS = add_eval_cols(RESULTS)
-    RESULTS[FINAL_COLS].to_csv("store_recordings.csv")  # TODO: better name, different format?
+    file = build_file_path_for_countings(args.station, args.board)
+    RESULTS[FINAL_COLS].to_csv(file)
