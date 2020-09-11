@@ -7,6 +7,8 @@ import os
 
 import pytz
 
+from helpers import find_elem_with_closest_ts
+
 utc = pytz.utc
 
 from config import PATH_TO_RECORDINGS
@@ -23,20 +25,6 @@ utc = pytz.utc
 from glob import glob
 
 TO_DETECT = ['car', 'traffic light', 'person']
-
-
-def find_elem_with_closest_ts(json_df, video_start, time_diff_tolerance=200):
-    """Find index of row whose timestamp is closest to video_start"""
-    s = abs(json_df["timestamp"] - video_start)
-    # print(minimal_time_diff)
-    # print("closest timestamp in tracker JSON", json_df.loc[s.idxmin(), "timestamp"])
-    minimal_time_diff = (json_df.loc[s.idxmin(), "timestamp"] - video_start)
-    minimal_time_diff = int(round(minimal_time_diff.total_seconds() * 1e3))
-    print(f"minimal time difference between tracker and image time: {minimal_time_diff}")
-    if minimal_time_diff < time_diff_tolerance:
-        return s.idxmin()
-    else:
-        return None
 
 
 def draw_bounding_box(image_name, bounding_box_dimensions):

@@ -65,11 +65,12 @@ if __name__ == '__main__':
         print(d)
         resp = make_request(LAT, LON, d)
         weather_data.extend(resp[0])
-        if d == start_date:
-            station_info = resp[1]
+        # if d == start_date:
+        #     station_info = resp[1]
 
         d += dt.timedelta(days=1)
 
-    dump_file = '_'.join(['weather_data', args.station, args.start, args.end, '.json'])
+    dump_file = '_'.join(['weather_data', args.station, '.json'])
     with open(dump_file, 'w') as f:
-        json.dump({'weather': weather_data, 'station': station_info}, f)
+        # json.dump({'weather': weather_data, 'station': station_info}, f)
+        json.dump(weather_data, f)

@@ -12,7 +12,7 @@ import pandas as pd
 from PIL import Image
 
 from config import STATIONS
-from helpers import split_video_into_images, build_file_path_for_countings
+from helpers import extract_sample_frames_from_video, build_file_path_for_countings
 
 parser = argparse.ArgumentParser(description='Estimate luminosity of videos and add to evaluation file')
 parser.add_argument('--station', type=str, required=True, choices=STATIONS,
@@ -41,7 +41,7 @@ def estimate_luminosity_of_video(rec):
     path = "tmp_images"
     os.mkdir(path)
 
-    split_video_into_images(rec, path)
+    extract_sample_frames_from_video(rec, path)
 
     total_brightness = []
     images = glob(join(path, "*.png"))

@@ -4,14 +4,12 @@ Creates a CSV file for evaluation of ODC countings.
 1. Reads counter history from exported counter JSON
 2. Reduces JSON to time frame of corresponding mp4 recording, since ODC recording starts earlier and stops later
 3. Adds columns for manual evaluation
-4. TODO: add columns for luminosity, day/night, weather
 """
-
-# TODO: activate sampling later
 
 import argparse
 import json
 from glob import glob
+from random import random
 
 import ffmpeg
 import numpy as np
@@ -19,10 +17,9 @@ import pandas as pd
 import pytz
 
 from config import *
-from helpers import build_file_path_for_countings
+from helpers import build_file_path_for_countings, get_datetime_of_recording
 
 utc = pytz.utc
-from datetime import datetime as dt
 import datetime
 
 RESULTS = {}
@@ -32,12 +29,12 @@ CLASSES = ["car", "person", "truck", "bicycle", "bus", "motorbike"]
 FINAL_COLS = ["movie_file", "direction", "ODC_car", "car", "ODC_person", "person", "ODC_truck", "truck", "ODC_bicycle",
               "bicycle", "ODC_bus", "bus", "ODC_motorbike", "motorbike"]
 
-parser = argparse.ArgumentParser(description='Prepare file for evaluation of ODC counts')
+parser = argparse.ArgumentParser(description='Build file for evaluation of ODC counts')
 parser.add_argument('-d', '--delay', type=int, default=250,
                     help='number of milliseconds to add as delay to ODC records')
 parser.add_argument('--station', type=str, required=True, choices=STATIONS,
                     help='one of our two stations')
-parser.add_argument('--board', type=str, required=True, choices=['nano', 'tx2', 'xavier'],
+parser.add_argument('--board', type=str, required=True, choices=BOARDS,
                     help='type of board')
 args = parser.parse_args()
 
@@ -86,8 +83,7 @@ def main(r):
     counter_history = load_counter_history(counter_file)
     directions = counter_history["countingDirection"].unique()
     recording_date = r.split("/")[-1]
-    ffmpeg_start_time = dt(*tuple(int(x) for x in recording_date.split("-")), tzinfo=utc) + datetime.timedelta(
-        hours=-2)
+    ffmpeg_start_time = get_datetime_of_recording(recording_date)
     for d in directions:
         object_counts = count_objects_for_reduced_timeframe(start_time=ffmpeg_start_time,
                                                             end_time=ffmpeg_start_time + datetime.timedelta(
@@ -98,9 +94,10 @@ def main(r):
 
 if __name__ == "__main__":
 
-    recordings = glob(join(PATH_TO_RECORDINGS, "*"))
-    # sample_size = len(recordings) // 3
-    # recordings = random.sample(recordings, sample_size)
+    recordings = glob(join(PATH_TO_RECORDINGS, args.station, args.board, "*"))
+    """random sampling --> 1/3 of data"""
+    sample_size = len(recordings) // 3
+    recordings = random.sample(recordings, sample_size)
     print(recordings)
 
     for rec in recordings:
