@@ -1,7 +1,7 @@
 """
 Fetch weather data for specified ODC station, start and end date.
 E.g. in order to fetch the data from the weather station closest to ECDF from September 1st until September 15th, run:
-python extract_weather_data.py --station ECDF --start 2020-09-01 --end 2020-09-15
+python fetch_weather_data.py --station ECDF --start 2020-09-01 --end 2020-09-15
 Data is dumped to a JSON file and can be used later to match with ODC counts.
 """
 import argparse
