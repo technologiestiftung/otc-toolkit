@@ -1,7 +1,7 @@
 """
 Fetch weather data for specified ODC station, start and end date.
 E.g. in order to fetch the data from the weather station closest to ECDF from September 1st until September 15th, run:
-python fetch_weather_data.py --station ECDF --start 2020-09-01 --end 2020-09-15
+python fetch_weather_data.py --station ecdf --start 2020-09-01 --end 2020-09-15
 Data is dumped to a JSON file and can be used later to match with ODC counts.
 """
 import argparse
@@ -11,11 +11,11 @@ import json
 import requests
 
 # folder = "2020-04-21-15-31-14-753487"
+from config import STATIONS
 
 URL = "https://api.brightsky.dev/weather"
 
-STATIONS = ['ECDF', 'CityLab']
-STATION_LAT_LON = {'ECDF': ('52.5184', '13.3807'), 'CityLab': ('52.4837929', '13.3863135')}
+STATION_LAT_LON = {'ecdf': ('52.5184', '13.3807'), 'citylab': ('52.4837929', '13.3863135')}
 
 parser = argparse.ArgumentParser(description='Extract historical weather data')
 parser.add_argument('--start', type=str, default='2020-08-01',

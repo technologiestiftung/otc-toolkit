@@ -11,6 +11,7 @@ Creates a CSV file for evaluation of ODC countings.
 
 import argparse
 import json
+from glob import glob
 
 import ffmpeg
 import numpy as np
@@ -114,4 +115,4 @@ if __name__ == "__main__":
     RESULTS = postproces_odc_counting_cols(RESULTS)
     RESULTS = add_eval_cols(RESULTS)
     file = build_file_path_for_countings(args.station, args.board)
-    RESULTS[FINAL_COLS].to_csv(file)
+    RESULTS[FINAL_COLS].to_csv(file, index=False)
