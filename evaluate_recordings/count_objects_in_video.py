@@ -8,8 +8,8 @@ Creates a CSV file for evaluation of ODC countings.
 
 import argparse
 import json
+import random
 from glob import glob
-from random import random
 
 import ffmpeg
 import numpy as np
@@ -41,10 +41,14 @@ args = parser.parse_args()
 
 def load_counter_history(file_path):
     data = json.load(open(file_path))
-    df = pd.DataFrame(data["counterHistory"])
-    df["timestamp"] = pd.to_datetime(df["timestamp"])
-    df["timestamp"] = df["timestamp"] + datetime.timedelta(milliseconds=args.delay)
-    return df
+    try:
+        df = pd.DataFrame(data["counterHistory"])
+        df["timestamp"] = pd.to_datetime(df["timestamp"])
+        df["timestamp"] = df["timestamp"] + datetime.timedelta(milliseconds=args.delay)
+
+        return df
+    except KeyError:
+        return None
 
 
 def count_objects_for_reduced_timeframe(start_time, end_time, counter_df, counting_direction=None):
@@ -54,7 +58,10 @@ def count_objects_for_reduced_timeframe(start_time, end_time, counter_df, counti
         df = counter_df.copy()
 
     df = df[(df["timestamp"] >= start_time) & (df["timestamp"] <= end_time)]
-    return df.name.value_counts()
+    values = df.name.value_counts().keys().tolist()
+    counts = df.name.value_counts().tolist()
+    value_dict = dict(zip(values, counts))
+    return value_dict
 
 
 def postproces_odc_counting_cols(df):
@@ -74,6 +81,7 @@ def add_eval_cols(df):
 
 
 def main(r):
+    print(r)
     global RESULTS
     video_file = glob(join(r, "*.mp4"))[0]  # there is always only one mp4 file per directory
     duration_milliseconds = np.float(ffmpeg.probe(video_file)['format']['duration']) * 1000
@@ -81,34 +89,38 @@ def main(r):
     # counter_file = join(PATH_TO_RECORDINGS, "2020-08-20-16-31-20-174967",
     #                  "2020-08-20-16-31-20-174967_counter.json")
     counter_history = load_counter_history(counter_file)
-    directions = counter_history["countingDirection"].unique()
-    recording_date = r.split("/")[-1]
-    ffmpeg_start_time = get_datetime_of_recording(recording_date)
-    for d in directions:
-        object_counts = count_objects_for_reduced_timeframe(start_time=ffmpeg_start_time,
-                                                            end_time=ffmpeg_start_time + datetime.timedelta(
-                                                                milliseconds=duration_milliseconds),
-                                                            counter_df=counter_history, counting_direction=d)
-        RESULTS[video_file] = {**RESULTS.get(video_file, {}), **{d: object_counts}}
+    if counter_history is not None:
+        directions = counter_history["countingDirection"].unique()
+        recording_date = r.split("/")[-1]
+        ffmpeg_start_time = get_datetime_of_recording(recording_date)
+        for d in directions:
+            object_counts = count_objects_for_reduced_timeframe(start_time=ffmpeg_start_time,
+                                                                end_time=ffmpeg_start_time + datetime.timedelta(
+                                                                    milliseconds=duration_milliseconds),
+                                                                counter_df=counter_history, counting_direction=d)
+            RESULTS[video_file] = {**RESULTS.get(video_file, {}), **{d: object_counts}}
+
 
 def sample_recordings(r, factor=3):
-    return random.sample(r, factor)
+    random.seed(30)
+    length = len(r) // factor
+    return random.sample(r, length)
+
 
 if __name__ == "__main__":
 
     recordings = glob(join(PATH_TO_RECORDINGS, args.station, args.board, "*"))
     """random sampling of data"""
-    recordings = sample_recordings(recordings, factor=2) # for citylab tx2 we have less data
+    recordings = sample_recordings(recordings, factor=2)  # for citylab tx2 we have less data
 
     for rec in recordings:
         main(rec)
-
     RESULTS = pd.DataFrame.from_dict({(i, j): RESULTS[i][j]
                                       for i in RESULTS.keys()
                                       for j in RESULTS[i].keys()},
                                      orient='index')
+    print(RESULTS.head())
     RESULTS.reset_index(inplace=True)
-
     RESULTS = postproces_odc_counting_cols(RESULTS)
     RESULTS = add_eval_cols(RESULTS)
     file = build_file_path_for_countings(args.station, args.board)
