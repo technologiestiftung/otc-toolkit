@@ -8,6 +8,7 @@ Creates a CSV file for evaluation of ODC countings.
 
 import argparse
 import json
+import pickle
 import random
 from glob import glob
 
@@ -23,10 +24,12 @@ utc = pytz.utc
 import datetime
 
 RESULTS = {}
+LEFTOVERS = []
 
 CLASSES = ["car", "person", "truck", "bicycle", "bus", "motorbike"]
 
-FINAL_COLS = ["movie_file", "direction", "ODC_car", "car", "ODC_person", "person", "ODC_truck", "truck", "ODC_bicycle",
+FINAL_COLS = ["movie_file", "area", "direction", "ODC_car", "car", "ODC_person", "person", "ODC_truck", "truck",
+              "ODC_bicycle",
               "bicycle", "ODC_bus", "bus", "ODC_motorbike", "motorbike"]
 
 parser = argparse.ArgumentParser(description='Build file for evaluation of ODC counts')
@@ -51,11 +54,12 @@ def load_counter_history(file_path):
         return None
 
 
-def count_objects_for_reduced_timeframe(start_time, end_time, counter_df, counting_direction=None):
+def count_objects_for_reduced_timeframe(start_time, end_time, counter_df, area, counting_direction=None):
+    df = counter_df[counter_df["area"] == area]
     if counting_direction is not None:
-        df = counter_df[counter_df["countingDirection"] == counting_direction]
+        df = df[df["countingDirection"] == counting_direction]
     else:
-        df = counter_df.copy()
+        df = df.copy()
 
     df = df[(df["timestamp"] >= start_time) & (df["timestamp"] <= end_time)]
     values = df.name.value_counts().keys().tolist()
@@ -81,8 +85,8 @@ def add_eval_cols(df):
 
 
 def main(r):
-    print(r)
     global RESULTS
+    global LEFTOVERS
     video_file = glob(join(r, "*.mp4"))[0]  # there is always only one mp4 file per directory
     duration_milliseconds = np.float(ffmpeg.probe(video_file)['format']['duration']) * 1000
     counter_file = glob(join(r, "*_counter.json"))[0]
@@ -91,14 +95,19 @@ def main(r):
     counter_history = load_counter_history(counter_file)
     if counter_history is not None:
         directions = counter_history["countingDirection"].unique()
+        areas = counter_history["area"].unique()
         recording_date = r.split("/")[-1]
         ffmpeg_start_time = get_datetime_of_recording(recording_date)
-        for d in directions:
-            object_counts = count_objects_for_reduced_timeframe(start_time=ffmpeg_start_time,
-                                                                end_time=ffmpeg_start_time + datetime.timedelta(
-                                                                    milliseconds=duration_milliseconds),
-                                                                counter_df=counter_history, counting_direction=d)
-            RESULTS[video_file] = {**RESULTS.get(video_file, {}), **{d: object_counts}}
+        for a in areas:
+            for d in directions:
+                object_counts = count_objects_for_reduced_timeframe(start_time=ffmpeg_start_time,
+                                                                    end_time=ffmpeg_start_time + datetime.timedelta(
+                                                                        milliseconds=duration_milliseconds),
+                                                                    counter_df=counter_history, area=a,
+                                                                    counting_direction=d)
+                RESULTS[video_file] = {**RESULTS.get(video_file, {}), **{a + '+' + d: object_counts}}
+    else:
+        LEFTOVERS.append(r)
 
 
 def sample_recordings(r, factor=3):
@@ -119,9 +128,11 @@ if __name__ == "__main__":
                                       for i in RESULTS.keys()
                                       for j in RESULTS[i].keys()},
                                      orient='index')
-    print(RESULTS.head())
     RESULTS.reset_index(inplace=True)
     RESULTS = postproces_odc_counting_cols(RESULTS)
+    RESULTS[['area', 'direction']] = RESULTS["direction"].str.split("+", expand=True, )
     RESULTS = add_eval_cols(RESULTS)
     file = build_file_path_for_countings(args.station, args.board)
     RESULTS[FINAL_COLS].to_csv(file, index=False)
+    with open(file.replace('.csv', 'leftovers.pkl'), 'wb') as f:
+        pickle.dump(LEFTOVERS, f)
