@@ -22,7 +22,13 @@ def extract_weather_info(v):
     idx = find_elem_with_closest_ts(df=WEATHER_DATA, video_start=rec_date, time_diff_tolerance=None)
     row = WEATHER_DATA.loc[idx]
     print(row)
-    day_or_night = row["icon"].split('-')[-1]
+    if 'day' in row["icon"]:
+        day_or_night = 'day'
+    elif 'night' in row["icon"]:
+        day_or_night = 'night'
+    else:
+        day_or_night = ''
+    # day_or_night = row["icon"].split('-')[-1]
     weather_category = row["icon"].replace(day_or_night, '').rstrip('-')
     return row["condition"], weather_category, day_or_night
 
