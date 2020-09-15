@@ -91,14 +91,14 @@ def main(r):
                                                             counter_df=counter_history, counting_direction=d)
         RESULTS[video_file] = {**RESULTS.get(video_file, {}), **{d: object_counts}}
 
+def sample_recordings(r, factor=3):
+    return random.sample(r, factor)
 
 if __name__ == "__main__":
 
     recordings = glob(join(PATH_TO_RECORDINGS, args.station, args.board, "*"))
-    """random sampling --> 1/3 of data"""
-    sample_size = len(recordings) // 3
-    recordings = random.sample(recordings, sample_size)
-    print(recordings)
+    """random sampling of data"""
+    recordings = sample_recordings(recordings, factor=2) # for citylab tx2 we have less data
 
     for rec in recordings:
         main(rec)

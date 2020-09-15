@@ -6,7 +6,7 @@ python fetch_weather_data.py --start 2020-08-01 --station ecdf
 ``
 
 2. Create a directory `data`. Within `data`, create subdirectories `<station>/<board>`, e.g. `ecdf/nano`.
-3. For every combination of `station` and ``board` run
+3. For every combination of `station` and `board` run
 
 ```bash
 python count_objects_in_video.py --station <station> --board <board>
