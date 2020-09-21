@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -euo pipefail
+set -eo pipefail
 IFS=$'\n\t'
 
 #
@@ -14,10 +14,11 @@ IFS=$'\n\t'
 # $2    Is the path where the record-all-day.sh is stored
 #
 #
-#
+
 function main() {
   TIMESTAMP="$(date '+%Y-%m-%d-%H-%M-%S-%6N')"
   echo "Timestamp: $TIMESTAMP"
+  echo "running on: $PLATFORM"
   cd "$2"
 
   /usr/bin/python3.7 ./stop_odc_recording.py
