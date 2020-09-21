@@ -9,13 +9,14 @@ import pandas as pd
 
 from config import PATH_TO_RECORDINGS
 
-tracker_data_files = glob(join(PATH_TO_RECORDINGS, "**/*_tracker.json"))
+recordings = glob(join(PATH_TO_RECORDINGS, "*"))
 
-# print(tracker_data_files)
+print(recordings)
 
-for f in tracker_data_files:
-    print(f"path to JSON file: {f}")
-    tracker_data = pd.read_json(f)
+for r in recordings:
+    tracker_file = glob(join(r, "*_tracker.json"))[0]
+    print(f"path to JSON file: {tracker_file}")
+    tracker_data = pd.read_json(tracker_file)
     # print(tracker_data.shape)
     print(f"number of rows tracker JSON: {len(tracker_data)}")
     print(f"number of distinct frames in tracker JSON: {tracker_data.frameId.nunique()}")
@@ -23,5 +24,12 @@ for f in tracker_data_files:
     frames = tracker_data.groupby("frameId").aggregate(list)
     frames.timestamp = frames.timestamp.map(lambda x: set(x))
     print(f"number of timestamps per frame: {frames.timestamp.map(lambda x: len(x)).value_counts()}")
+    tracking_duration = tracker_data['timestamp'].max() - tracker_data['timestamp'].min()
+    print(f"tracking duration: {tracking_duration}")
+    print(f"number of rows per second: {len(tracker_data)/tracking_duration.total_seconds()}")
+    print(f"number of distinct frames per second: {tracker_data.frameId.nunique()/tracking_duration.total_seconds()}")
 
-    print(f"tracking duration: {tracker_data['timestamp'].max() - tracker_data['timestamp'].min()}")
+    images = glob(join(r, "*.png"))
+    print(f"number of images: {len(images)}")
+
+    print("--------------------")

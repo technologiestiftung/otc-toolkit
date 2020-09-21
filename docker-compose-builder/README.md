@@ -1,3 +1,6 @@
+This part of the tool is **DEPRECATED** since opendatacam switched to a docker-compose setup.
+
+
 # Opendatacam docker-compose.yml Builder
 
 Note: This is deprecated work. ODC switched to a docker-compose setup. Only the additional containers and the mongo as replica-set is relevant. The docker-compose generating process is not needed anymore. Needs clenaup @fabianmonronzirfas
