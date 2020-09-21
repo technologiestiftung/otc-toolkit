@@ -9,7 +9,6 @@ Creates a CSV file for evaluation of ODC countings.
 import argparse
 import json
 import pickle
-import random
 from glob import glob
 
 import ffmpeg
@@ -26,11 +25,11 @@ import datetime
 RESULTS = {}
 LEFTOVERS = []
 
-CLASSES = ["car", "person", "truck", "bicycle", "bus", "motorbike"]
+CLASSES = ["car", "truck", "bicycle", "bus", "motorbike"]
 
-FINAL_COLS = ["movie_file", "area", "direction", "ODC_car", "car", "ODC_person", "person", "ODC_truck", "truck",
-              "ODC_bicycle",
-              "bicycle", "ODC_bus", "bus", "ODC_motorbike", "motorbike"]
+FINAL_COLS = ["row_number", "movie_file", "direction", "ODC_car", "car", "ODC_truck", "truck",
+              "ODC_bicycle", "bicycle", "ODC_bus", "bus", "ODC_motorbike",
+              "motorbike"]  # TODO: do we need to include 'area' for ECDF?
 
 parser = argparse.ArgumentParser(description='Build file for evaluation of ODC counts')
 parser.add_argument('-d', '--delay', type=int, default=250,
@@ -110,18 +109,17 @@ def main(r):
         LEFTOVERS.append(r)
 
 
-def sample_recordings(r, factor=3):
-    random.seed(30)
-    length = len(r) // factor
-    return random.sample(r, length)
+#
+# def sample_recordings(r, factor=3):
+#     random.seed(30)
+#     length = len(r) // factor
+#     return r.sample(r, length)
 
 
 if __name__ == "__main__":
 
     recordings = glob(join(PATH_TO_RECORDINGS, args.station, args.board, "*"))
     """random sampling of data"""
-    recordings = sample_recordings(recordings, factor=2)  # for citylab tx2 we have less data
-
     for rec in recordings:
         main(rec)
     RESULTS = pd.DataFrame.from_dict({(i, j): RESULTS[i][j]
@@ -132,6 +130,11 @@ if __name__ == "__main__":
     RESULTS = postproces_odc_counting_cols(RESULTS)
     RESULTS[['area', 'direction']] = RESULTS["direction"].str.split("+", expand=True, )
     RESULTS = add_eval_cols(RESULTS)
+    if args.station == "citylab":
+        RESULTS.replace({"direction": {"leftright_topbottom": "left", "rightleft_bottomtop": "right"}}, inplace=True)
+        RESULTS.drop("area", axis=1, inplace=True)  # direction already unique
+        RESULTS = RESULTS.sample(random_state=1, frac=0.5, axis=0)  # for citylab tx2 we have less data
+    RESULTS["row_number"] = range(1, 1 + len(RESULTS))
     file = build_file_path_for_countings(args.station, args.board)
     RESULTS[FINAL_COLS].to_csv(file, index=False)
     with open(file.replace('.csv', 'leftovers.pkl'), 'wb') as f:

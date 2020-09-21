@@ -20,10 +20,6 @@ python draw_counter_lines_in-video.py --board tx2 --station citylab --row 3
 """
 
 
-#
-# cv2.namedWindow("preview")
-# vc = cv2.VideoCapture(0)
-
 def extract_recording(s, b):
     csv_file_path = build_file_path_for_countings(s, b)
     return pd.read_csv(csv_file_path)
@@ -32,11 +28,9 @@ def extract_recording(s, b):
 if __name__ == '__main__':
 
     df = extract_recording(args.station, args.board)
-    path_to_video = df.loc[args.row, 'movie_file']
-
-    # filename = 'SampleVideo.mp4'
+    path_to_video = df[df["row_number"] == args.row]['movie_file'].values[0]
+    print(path_to_video)
     vc = cv2.VideoCapture(path_to_video)
-    # out = cv2.VideoWriter('output.avi', -1, 20.0, (640, 480))
     if args.station == "citylab" and args.board == "tx2":
         scaling_factor_x = 640 / 1440
         scaling_factor_y = 360 / 815
@@ -54,9 +48,9 @@ if __name__ == '__main__':
         print(line_location)
 
         pt1 = (
-        int(line_location["point1"]["x"] * scaling_factor_x), int(line_location["point1"]["y"] * scaling_factor_y))
+            int(line_location["point1"]["x"] * scaling_factor_x), int(line_location["point1"]["y"] * scaling_factor_y))
         pt2 = (
-        int(line_location["point2"]["x"] * scaling_factor_x), int(line_location["point2"]["y"] * scaling_factor_y))
+            int(line_location["point2"]["x"] * scaling_factor_x), int(line_location["point2"]["y"] * scaling_factor_y))
         # path_to_counter_file = path_to_video.replace('.mp4', '_counter.json')
         print(pt1, pt2)
 
@@ -69,7 +63,9 @@ if __name__ == '__main__':
         cv2.imshow("preview", frame)
         rval, frame = vc.read()
         key = cv2.waitKey(20)
-        if key == 27:  # exit on ESC
+        if cv2.waitKey(1) and key == 27:
+
+            # exit on ESC
             break
         else:
             cv2.line(img=frame, pt1=pt1, pt2=pt2, color=(255, 0, 0), thickness=3, lineType=8, shift=0)
