@@ -13,6 +13,8 @@ parser.add_argument('--station', type=str, required=True, choices=STATIONS,
                     help='one of our two stations')
 parser.add_argument('--board', type=str, required=True, choices=BOARDS,
                     help='type of board')
+parser.add_argument('--delay', type=int, required=False, default=1,
+                    help='delay the video')
 args = parser.parse_args()
 
 """Run e.g.
@@ -63,7 +65,7 @@ if __name__ == '__main__':
         cv2.imshow("preview", frame)
         rval, frame = vc.read()
         key = cv2.waitKey(20)
-        if cv2.waitKey(1) and key == 27:
+        if cv2.waitKey(int(args.delay)) and key == 27:
 
             # exit on ESC
             break
