@@ -2,10 +2,7 @@
 set -euo pipefail
 IFS=$'\n\t'
 
-# The crontab should export a variable called 
-# PLATFORM which holds the values docker or tx2
-#
-#
+
 # This script wants as arguments
 # $1    first argument is the path
 #       to the folder containing the docker-compose.yml
@@ -20,7 +17,7 @@ function main() {
   echo "Timestamp: $TIMESTAMP"
   cd "$3"
 
-  ./start_odc.sh -p "$PLATFORM" "$1"
+  ./start_odc.sh -p "tx2" "$1"
 
   sleep 60
 
@@ -46,9 +43,9 @@ function main() {
 
   ./ffmpeg_split.sh "$2"
 
-  sleep 5
+  sleep 60
 
-  ./stop_odc.sh -p "$PLATFORM" "$1"
+  ./stop_odc.sh -p "tx2" "$1"
 
   sleep 5
 
