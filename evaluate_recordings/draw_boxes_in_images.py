@@ -3,28 +3,37 @@
 2. For each image, finds the ODC tracking event with closest timestamp
 3. TODO
 """
+import argparse
+import datetime
 import os
-
-import pytz
-
-from helpers import find_elem_with_closest_ts
-
-utc = pytz.utc
-
-from config import PATH_TO_RECORDINGS
-
-import pandas as pd
-from PIL import Image, ImageFont, ImageDraw
+from datetime import datetime as dt
 from os.path import join
 
-from datetime import datetime as dt
-import datetime
+import pandas as pd
 import pytz
+from PIL import Image, ImageFont, ImageDraw
+
+from config import CLASSES
+from helpers import find_elem_with_closest_ts, extract_recording, extract_subpaths_from_video_path, \
+    split_video_into_images
 
 utc = pytz.utc
 from glob import glob
 
-TO_DETECT = ['car', 'traffic light', 'person']
+from config import STATIONS, BOARDS
+
+parser = argparse.ArgumentParser(description='Run video listed in a CSV file and draw a line in it')
+parser.add_argument('-r', '--row', type=int, required=True,
+                    help='row number of CSV file')
+parser.add_argument('--station', type=str, required=True, choices=STATIONS,
+                    help='one of our two stations')
+parser.add_argument('--board', type=str, required=True, choices=BOARDS,
+                    help='type of board')
+parser.add_argument('--play-delay', type=int, required=False, default=1,
+                    help='delay the video')
+parser.add_argument('-d', '--delay', type=int, default=250,
+                    help='number of milliseconds to add as delay to ODC records')
+args = parser.parse_args()
 
 
 def draw_bounding_box(image_name, bounding_box_dimensions):
@@ -32,7 +41,7 @@ def draw_bounding_box(image_name, bounding_box_dimensions):
     draw = ImageDraw.Draw(source_img)
     # print("image : ", image_name)
 
-    bounding_boxes = [item for item in bounding_box_dimensions if item['name'] in TO_DETECT]
+    bounding_boxes = [item for item in bounding_box_dimensions if item['name'] in CLASSES]
     # print(bounding_boxes)
     for item in bounding_boxes:
         x = item["x"]
@@ -47,17 +56,20 @@ def draw_bounding_box(image_name, bounding_box_dimensions):
     source_img.save(image_name.replace(".png", "_boxes.png"))
 
 
-def delete_images_with_bounding_box(path_to_dir):
+def delete_images(path_to_dir, with_bounding_box_only=True):
     """Delete old images with bounding boxes"""
-    files = glob(join(path_to_dir, "*_boxes.png"))
+    if with_bounding_box_only:
+        files = glob(join(path_to_dir, "*_boxes.png"))
+    else:
+        files = glob(join(path_to_dir, "*.png"))
     for f in files:
         os.remove(f)
 
 
 def extract_timestamp_from_file_name(image_file_name, video_start):
     image_file_name = image_file_name.split("/")[-1]
-    milisec = int(image_file_name.replace("out", "").replace(".png", ""))  # TODO: too hacky, replace this
-    image_time = video_start + datetime.timedelta(milliseconds=milisec + 250)  # TODO 200 is an artificial delay
+    milisec = int(image_file_name.replace(".png", ""))  # image file name are the miliseconds elapsed since video start
+    image_time = video_start + datetime.timedelta(milliseconds=milisec + args.delay)
     return image_time
 
 
@@ -75,43 +87,40 @@ def assign_tracking_to_image_via_rec_time(images_with_time, json_df):
 
 
 if __name__ == '__main__':
-    recordings = [item.split("/")[1] for item in glob(join(PATH_TO_RECORDINGS, "**"))]
-    print(recordings)
+    df = extract_recording(args.station, args.board)
+    path_to_video = df[df["row_number"] == args.row]['movie_file'].values[0]
+    print(path_to_video)
+    rec_dir, rec_date, video_file = extract_subpaths_from_video_path(path_to_video)
+    try:
+        delete_images(rec_dir, with_bounding_box_only=False) # delete all PNGs to save storage; otherwise next line should not be executed more than once
+        split_video_into_images(rec_dir, path_to_video)
 
-    for rec in recordings:
-        print(f"recording: {rec}")
-        try:
-            delete_images_with_bounding_box(join(PATH_TO_RECORDINGS, rec))
+        ffmpeg_start_time = dt(*tuple(int(x) for x in rec_date.split("-")), tzinfo=utc) + datetime.timedelta(hours=-2)
+        images = glob(join(rec_dir, "*.png"))
+        image_to_rectime = dict(
+            zip(images, [extract_timestamp_from_file_name(i, ffmpeg_start_time) for i in images]))
+        tracker_data = pd.read_json(join(rec_dir, rec_date + "_tracker.json"))
 
-            ffmpeg_start_time = dt(*tuple(int(x) for x in rec.split("-")), tzinfo=utc) + datetime.timedelta(hours=-2)
+        """use below if you want to to join on frames instead of timestamps"""
+        #########
+        # tracker_data.drop_duplicates(subset=["frameId"], inplace=True, ignore_index=True)
+        #########
 
-            images = glob(join(PATH_TO_RECORDINGS, rec, "*.png"))
-            images = sorted(images)
-            image_to_rectime = dict(
-                zip(images, [extract_timestamp_from_file_name(i, ffmpeg_start_time) for i in images]))
+        # tracker_data = reduce_tracker_json(tracker_data, ffmpeg_start_time, len(images))
+        # print(f"number of images: {len(images)}")
+        # print(f"JSON entries: {len(tracker_data)}")
 
-            tracker_data = pd.read_json(join(PATH_TO_RECORDINGS, rec, rec + "_tracker.json"))
+        # merged = merge(tracker_data, images)
+        merged = assign_tracking_to_image_via_rec_time(image_to_rectime, tracker_data)
+        print(len(merged))
+        # print(merged.items())
+        #
+        for i, obj in merged.items():
+            # print(i)
+            try:
+                draw_bounding_box(i, obj)
+            except:
+                print(f"image not found: {i}")
 
-            """use below if you want to to join on frames instead of timestamps"""
-            #########
-            # tracker_data.drop_duplicates(subset=["frameId"], inplace=True, ignore_index=True)
-            #########
-
-            # tracker_data = reduce_tracker_json(tracker_data, ffmpeg_start_time, len(images))
-            # print(f"number of images: {len(images)}")
-            # print(f"JSON entries: {len(tracker_data)}")
-
-            # merged = merge(tracker_data, images)
-            merged = assign_tracking_to_image_via_rec_time(image_to_rectime, tracker_data)
-            print(len(merged))
-            # print(merged.items())
-            #
-            for i, obj in merged.items():
-                # print(i)
-                try:
-                    draw_bounding_box(i, obj)
-                except:
-                    print(f"image not found: {i}")
-
-        except:
-            print("did not work")
+    except:
+        print("did not work")

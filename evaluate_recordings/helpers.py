@@ -1,19 +1,21 @@
 import datetime
+import os
 from os.path import join
 
 import ffmpeg
+import pandas as pd
 import pytz
 
 utc = pytz.utc
 from datetime import datetime as dt
 
 
-# def split_video_into_images(v):
-# needed for drawing of boxes
-#     # res = subprocess.check_output(["ffmpeg", "-skip_frame", "nokey", "-i", v, "-vsync", "0", "-frame_pts", "true", "-r", "1000", "out%d.png"])
-#     # for line in res.splitlines():
-#     bashCommand = "ffmpeg -skip_frame nokey -i " + v + " -vsync 0 -frame_pts true -r 1000 hw%d.png"
-#     output = subprocess.check_output(['bash', '-c', bashCommand])
+def split_video_into_images(rec_dir, video_file):
+    # needed for drawing of boxes
+    ffmpeg_split_cmd = "ffmpeg -skip_frame nokey -i " + video_file + " -vsync 0 -frame_pts true -r 1000 " + rec_dir + "/" + "%d.png"
+    print(ffmpeg_split_cmd)
+    os.system(ffmpeg_split_cmd)
+
 
 def extract_sample_frames_from_video(video_file, path_for_images):
     try:
@@ -54,3 +56,16 @@ def find_elem_with_closest_ts(df, video_start, time_diff_tolerance=200):
             return None
     else:
         return s.idxmin()
+
+
+def extract_recording(s, b):
+    csv_file_path = build_file_path_for_countings(s, b)
+    return pd.read_csv(csv_file_path)
+
+
+def extract_subpaths_from_video_path(v):
+    dirs = v.split("/")  # wouldn't work on Windows
+    rec_dir = "/".join(dirs[:-1])
+    video_file = dirs[-1]
+    rec_date = video_file.replace(".mp4", "")
+    return rec_dir, rec_date, video_file

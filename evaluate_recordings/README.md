@@ -1,7 +1,18 @@
+## Prepare recordings
+
+1. Create directory `data` in this directory; create for each station and each board type a subdirectory, e.g. `citylab/tx2`.
+2. Copy all zip files from the SSDs to the respective subdirectories
+3. Unzip the folders into subfolders with the same naming convention as the original ones:
+
+```bash
+for file in *.zip; do unzip "${file}" -d "${file:0:26}"; done
+```
+4. Check recordings and remove those that are not useful for evaluation; Remove all zip-files
+
 ## Prepare a CSV file for evaluation
 
 
-1. Run first the following to fetch weather data for ECDF. Already done for citylab.
+1. Run first the following to fetch weather data for ECDF (and citylab).
 
 ```bash
 python fetch_weather_data.py --start 2020-08-01 --station ecdf
