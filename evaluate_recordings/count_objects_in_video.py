@@ -6,6 +6,9 @@ Creates a CSV file for evaluation of ODC countings.
 3. Adds columns for manual evaluation
 """
 
+# TODO: refactor script: area defines a counter line. at ecdf it is currently bidirectional, so all are counted.
+#  But for an area we can have items in counterhistory in both directions. So not a 1-to-1 relation. Need to take this into account
+
 import argparse
 import json
 import pickle
@@ -17,6 +20,7 @@ import pandas as pd
 import pytz
 
 from config import *
+from config import CLASSES
 from helpers import build_file_path_for_countings, get_datetime_of_recording
 
 utc = pytz.utc
@@ -25,9 +29,7 @@ import datetime
 RESULTS = {}
 LEFTOVERS = []
 
-CLASSES = ["car", "truck", "bicycle", "bus", "motorbike"]
-
-FINAL_COLS = ["row_number", "movie_file", "direction", "ODC_car", "car", "ODC_truck", "truck",
+FINAL_COLS = ["row_number", "movie_file", "area", "direction", "ODC_car", "car", "ODC_truck", "truck",
               "ODC_bicycle", "bicycle", "ODC_bus", "bus", "ODC_motorbike",
               "motorbike"]  # TODO: do we need to include 'area' for ECDF?
 
@@ -38,6 +40,8 @@ parser.add_argument('--station', type=str, required=True, choices=STATIONS,
                     help='one of our two stations')
 parser.add_argument('--board', type=str, required=True, choices=BOARDS,
                     help='type of board')
+parser.add_argument('--sample', type=int, default=3,
+                    help='1/(sampling factor)')
 args = parser.parse_args()
 
 
@@ -86,11 +90,10 @@ def add_eval_cols(df):
 def main(r):
     global RESULTS
     global LEFTOVERS
+    print(r)
     video_file = glob(join(r, "*.mp4"))[0]  # there is always only one mp4 file per directory
     duration_milliseconds = np.float(ffmpeg.probe(video_file)['format']['duration']) * 1000
     counter_file = glob(join(r, "*_counter.json"))[0]
-    # counter_file = join(PATH_TO_RECORDINGS, "2020-08-20-16-31-20-174967",
-    #                  "2020-08-20-16-31-20-174967_counter.json")
     counter_history = load_counter_history(counter_file)
     if counter_history is not None:
         directions = counter_history["countingDirection"].unique()
@@ -117,7 +120,6 @@ def main(r):
 
 
 if __name__ == "__main__":
-
     recordings = glob(join(PATH_TO_RECORDINGS, args.station, args.board, "*"))
     """random sampling of data"""
     for rec in recordings:
@@ -130,10 +132,17 @@ if __name__ == "__main__":
     RESULTS = postproces_odc_counting_cols(RESULTS)
     RESULTS[['area', 'direction']] = RESULTS["direction"].str.split("+", expand=True, )
     RESULTS = add_eval_cols(RESULTS)
+    RESULTS.replace({"direction": {"leftright_topbottom": "left", "rightleft_bottomtop": "right"}}, inplace=True)
+    RESULTS = RESULTS.sample(random_state=1, frac=1 / args.sample, axis=0)  # for citylab tx2 we have less data
     if args.station == "citylab":
-        RESULTS.replace({"direction": {"leftright_topbottom": "left", "rightleft_bottomtop": "right"}}, inplace=True)
         RESULTS.drop("area", axis=1, inplace=True)  # direction already unique
-        RESULTS = RESULTS.sample(random_state=1, frac=0.5, axis=0)  # for citylab tx2 we have less data
+        FINAL_COLS = [c for c in FINAL_COLS if c != "area"]
+    elif args.station == "ecdf":
+        RESULTS.replace(
+            {"area": {"a4ad8491-c790-4078-9092-94ac1e3e0b46": "ecdf-lindner",
+                      "882e3178-408a-4e3e-884f-d8d2290b47f0": "cross"}},
+            inplace=True) # TODO
+        FINAL_COLS.append("area")
     RESULTS["row_number"] = range(1, 1 + len(RESULTS))
     file = build_file_path_for_countings(args.station, args.board)
     RESULTS[FINAL_COLS].to_csv(file, index=False)
