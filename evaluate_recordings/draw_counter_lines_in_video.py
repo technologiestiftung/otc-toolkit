@@ -12,7 +12,7 @@ parser.add_argument('--station', type=str, required=True, choices=STATIONS,
                     help='one of our two stations')
 parser.add_argument('--board', type=str, required=True, choices=BOARDS,
                     help='type of board')
-parser.add_argument('--delay', type=int, required=False, default=1,
+parser.add_argument('--play_delay', type=int, required=False, default=1,
                     help='delay the video')
 args = parser.parse_args()
 
@@ -34,7 +34,7 @@ if __name__ == '__main__':
     else: # args.station == "ecdf" and args.board == "xavier":
         scaling_factor_x = 640 / 1189
         scaling_factor_y = 360 / 1018
-        line_direction = df[df["row_number"] == args.row]['direction'].values[0]  # it seems that I don't need it
+        #line_direction = df[df["row_number"] == args.row]['direction'].values[0]  # it seems that I don't need it
         line_area = df[df["row_number"] == args.row]['area'].values[0]
         line_location = COUNTER_LINE_COORDS[args.station][line_area]
 
@@ -53,7 +53,7 @@ if __name__ == '__main__':
         cv2.imshow("preview", frame)
         rval, frame = vc.read()
         key = cv2.waitKey(20)
-        if cv2.waitKey(int(args.delay)) and key == 27:
+        if cv2.waitKey(int(args.play_delay)) and key == 27:
 
             # exit on ESC
             break

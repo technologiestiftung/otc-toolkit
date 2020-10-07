@@ -29,7 +29,7 @@ parser.add_argument('--station', type=str, required=True, choices=STATIONS,
                     help='one of our two stations')
 parser.add_argument('--board', type=str, required=True, choices=BOARDS,
                     help='type of board')
-parser.add_argument('--play-delay', type=int, required=False, default=1,
+parser.add_argument('--play_delay', type=int, required=False, default=1,
                     help='delay the video')
 parser.add_argument('-d', '--delay', type=int, default=250,
                     help='number of milliseconds to add as delay to ODC records')

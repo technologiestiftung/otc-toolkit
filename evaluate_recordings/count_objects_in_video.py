@@ -131,9 +131,7 @@ if __name__ == "__main__":
     RESULTS.reset_index(inplace=True)
     RESULTS = postproces_odc_counting_cols(RESULTS)
     RESULTS[['area', 'direction']] = RESULTS["direction"].str.split("+", expand=True, )
-    RESULTS = add_eval_cols(RESULTS)
     RESULTS.replace({"direction": {"leftright_topbottom": "left", "rightleft_bottomtop": "right"}}, inplace=True)
-    RESULTS = RESULTS.sample(random_state=1, frac=1 / args.sample, axis=0)  # for citylab tx2 we have less data
     if args.station == "citylab":
         RESULTS.drop("area", axis=1, inplace=True)  # direction already unique
         FINAL_COLS = [c for c in FINAL_COLS if c != "area"]
@@ -141,10 +139,19 @@ if __name__ == "__main__":
         RESULTS.replace(
             {"area": {"a4ad8491-c790-4078-9092-94ac1e3e0b46": "ecdf-lindner",
                       "882e3178-408a-4e3e-884f-d8d2290b47f0": "cross"}},
-            inplace=True) # TODO
-        FINAL_COLS.append("area")
+            inplace=True)
+        RESULTS = RESULTS.groupby(['movie_file', 'area']).sum()
+        RESULTS.reset_index(inplace=True, drop=False)
+        print(RESULTS.head())
+
+
+    RESULTS = RESULTS.sample(random_state=1, frac=1 / args.sample, axis=0)  # for citylab tx2 we have less data
+    RESULTS = add_eval_cols(RESULTS)
+    print(RESULTS.head())
     RESULTS["row_number"] = range(1, 1 + len(RESULTS))
     file = build_file_path_for_countings(args.station, args.board)
+    if args.station == "ecdf":
+        FINAL_COLS = [c for c in FINAL_COLS if c != "direction"]
     RESULTS[FINAL_COLS].to_csv(file, index=False)
     with open(file.replace('.csv', 'leftovers.pkl'), 'wb') as f:
         pickle.dump(LEFTOVERS, f)
