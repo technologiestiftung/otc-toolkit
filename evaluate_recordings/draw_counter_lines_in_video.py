@@ -31,10 +31,10 @@ if __name__ == '__main__':
         scaling_factor_y = 360 / 815
         line_location = COUNTER_LINE_COORDS[args.station]
 
-    else: # args.station == "ecdf" and args.board == "xavier":
-        scaling_factor_x = 640 / 1189
-        scaling_factor_y = 360 / 1018
-        #line_direction = df[df["row_number"] == args.row]['direction'].values[0]  # it seems that I don't need it
+    else:  # args.station == "ecdf" and args.board == "xavier":
+        scaling_factor_x = 640 / 1356  # 1189
+        scaling_factor_y = 360 / 993  # 1018
+        # line_direction = df[df["row_number"] == args.row]['direction'].values[0]  # it seems that I don't need it
         line_area = df[df["row_number"] == args.row]['area'].values[0]
         line_location = COUNTER_LINE_COORDS[args.station][line_area]
 

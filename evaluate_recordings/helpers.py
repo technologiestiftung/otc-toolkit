@@ -1,5 +1,6 @@
 import datetime
 import os
+import zipfile
 from os.path import join
 
 import ffmpeg
@@ -39,7 +40,13 @@ def get_datetime_of_recording(r):
     """Every recording folder is a string representing the recording time on a board, which is two hours behind.
     Convert it to the correct datetime object.
     """
-    return dt(*tuple(int(x) for x in r.split("-")), tzinfo=utc) + datetime.timedelta(hours=-2)
+    # 'data/ecdf/xavier/2020-10-25-03-01-19-232469
+    clock_change = dt(*tuple(int(x) for x in "2020-10-25-03-00-00-000001".split("-")), tzinfo=utc)
+    ts = dt(*tuple(int(x) for x in r.split("-")), tzinfo=utc)
+    if ts < clock_change:
+        return ts + datetime.timedelta(hours=-2)
+    else:
+        return ts + datetime.timedelta(hours=-1)
 
 
 def find_elem_with_closest_ts(df, video_start, time_diff_tolerance=200):
@@ -69,3 +76,19 @@ def extract_subpaths_from_video_path(v):
     video_file = dirs[-1]
     rec_date = video_file.replace(".mp4", "")
     return rec_dir, rec_date, video_file
+
+
+def zipdir(path, ziph):
+    # ziph is zipfile handle
+    for root, dirs, files in os.walk(path):
+        for file in files:
+            ziph.write(os.path.join(root, file),
+                       os.path.relpath(os.path.join(root, file),
+                                       os.path.join(path, '..')))
+
+
+def zipit(dir_list, zip_name):
+    zipf = zipfile.ZipFile(zip_name, 'w', zipfile.ZIP_DEFLATED)
+    for dir in dir_list:
+        zipdir(dir, zipf)
+    zipf.close()

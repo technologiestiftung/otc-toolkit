@@ -6,9 +6,6 @@ Creates a CSV file for evaluation of ODC countings.
 3. Adds columns for manual evaluation
 """
 
-# TODO: refactor script: area defines a counter line. at ecdf it is currently bidirectional, so all are counted.
-#  But for an area we can have items in counterhistory in both directions. So not a 1-to-1 relation. Need to take this into account
-
 import argparse
 import json
 import pickle
@@ -20,7 +17,6 @@ import pandas as pd
 import pytz
 
 from config import *
-from config import CLASSES
 from helpers import build_file_path_for_countings, get_datetime_of_recording
 
 utc = pytz.utc
@@ -28,11 +24,13 @@ import datetime
 
 RESULTS = {}
 LEFTOVERS = []
+#
+# FINAL_COLS = ["row_number", "movie_file", "area", "direction", "ODC_car", "car", "ODC_truck", "truck",
+#               "ODC_bicycle", "bicycle", "ODC_bus", "bus", "ODC_motorbike",
+#               "motorbike"]
 
-FINAL_COLS = ["row_number", "movie_file", "area", "direction", "ODC_car", "car", "ODC_truck", "truck",
-              "ODC_bicycle", "bicycle", "ODC_bus", "bus", "ODC_motorbike",
-              "motorbike"]  # TODO: do we need to include 'area' for ECDF?
-
+FINAL_COLS = ["row_number", "movie_file", "area", "direction"] + ["ODC_" + c for c in CLASSES] + CLASSES
+print(f"final columns: {FINAL_COLS}")
 parser = argparse.ArgumentParser(description='Build file for evaluation of ODC counts')
 parser.add_argument('-d', '--delay', type=int, default=250,
                     help='number of milliseconds to add as delay to ODC records')
@@ -40,8 +38,8 @@ parser.add_argument('--station', type=str, required=True, choices=STATIONS,
                     help='one of our two stations')
 parser.add_argument('--board', type=str, required=True, choices=BOARDS,
                     help='type of board')
-parser.add_argument('--sample', type=int, default=3,
-                    help='1/(sampling factor)')
+parser.add_argument('--sample', type=int, default=200,
+                    help='number of rows to randomly select')
 args = parser.parse_args()
 
 
@@ -109,6 +107,7 @@ def main(r):
                                                                     counting_direction=d)
                 RESULTS[video_file] = {**RESULTS.get(video_file, {}), **{a + '+' + d: object_counts}}
     else:
+        print("LEFTOVER")
         LEFTOVERS.append(r)
 
 
@@ -120,8 +119,7 @@ def main(r):
 
 
 if __name__ == "__main__":
-    recordings = glob(join(PATH_TO_RECORDINGS, args.station, args.board, "*"))
-    """random sampling of data"""
+    recordings = sorted(glob(join(PATH_TO_RECORDINGS, args.station, args.board, "*")))
     for rec in recordings:
         main(rec)
     RESULTS = pd.DataFrame.from_dict({(i, j): RESULTS[i][j]
@@ -137,17 +135,16 @@ if __name__ == "__main__":
         FINAL_COLS = [c for c in FINAL_COLS if c != "area"]
     elif args.station == "ecdf":
         RESULTS.replace(
-            {"area": {"a4ad8491-c790-4078-9092-94ac1e3e0b46": "ecdf-lindner",
-                      "882e3178-408a-4e3e-884f-d8d2290b47f0": "cross"}},
+            {"area": COUNTER_LINE_NAMES["ecdf"]},
             inplace=True)
+
         RESULTS = RESULTS.groupby(['movie_file', 'area']).sum()
         RESULTS.reset_index(inplace=True, drop=False)
-        print(RESULTS.head())
 
-
-    RESULTS = RESULTS.sample(random_state=1, frac=1 / args.sample, axis=0)  # for citylab tx2 we have less data
+    """random sampling of data"""
+    print(len(RESULTS))
+    RESULTS = RESULTS.sample(random_state=1, n=args.sample, axis=0)
     RESULTS = add_eval_cols(RESULTS)
-    print(RESULTS.head())
     RESULTS["row_number"] = range(1, 1 + len(RESULTS))
     file = build_file_path_for_countings(args.station, args.board)
     if args.station == "ecdf":

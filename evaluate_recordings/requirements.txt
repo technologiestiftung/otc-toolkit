@@ -14,7 +14,7 @@ opencv-python==4.4.0.42
 pandas==1.1.0
 Pillow==7.2.0
 progressbar==2.5
-pycairo==1.19.1
+#pycairo==1.19.1
 pydub==0.24.1
 Pygments==2.6.1
 pyparsing==2.4.7

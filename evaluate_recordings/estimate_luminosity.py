@@ -38,8 +38,11 @@ def calculate_brightness(img):
 
 
 def estimate_luminosity_of_video(rec):
-    path = "tmp_images"
-    os.mkdir(path)
+    try:
+        path = "tmp_images"
+        os.mkdir(path)
+    except FileExistsError:
+        print("tmp folder already exists")
 
     extract_sample_frames_from_video(rec, path)
 
