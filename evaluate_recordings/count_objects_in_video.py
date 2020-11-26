@@ -29,7 +29,7 @@ LEFTOVERS = []
 #               "ODC_bicycle", "bicycle", "ODC_bus", "bus", "ODC_motorbike",
 #               "motorbike"]
 
-FINAL_COLS = ["row_number", "movie_file", "area", "direction"] + ["ODC_" + c for c in CLASSES] + CLASSES
+FINAL_COLS = ["row_number", "movie_file", "area"] + ["ODC_" + c for c in CLASSES] + CLASSES
 print(f"final columns: {FINAL_COLS}")
 parser = argparse.ArgumentParser(description='Build file for evaluation of ODC counts')
 parser.add_argument('-d', '--delay', type=int, default=250,
@@ -130,16 +130,20 @@ if __name__ == "__main__":
     RESULTS = postproces_odc_counting_cols(RESULTS)
     RESULTS[['area', 'direction']] = RESULTS["direction"].str.split("+", expand=True, )
     RESULTS.replace({"direction": {"leftright_topbottom": "left", "rightleft_bottomtop": "right"}}, inplace=True)
-    if args.station == "citylab":
-        RESULTS.drop("area", axis=1, inplace=True)  # direction already unique
-        FINAL_COLS = [c for c in FINAL_COLS if c != "area"]
-    elif args.station == "ecdf":
-        RESULTS.replace(
-            {"area": COUNTER_LINE_NAMES["ecdf"]},
-            inplace=True)
-
-        RESULTS = RESULTS.groupby(['movie_file', 'area']).sum()
-        RESULTS.reset_index(inplace=True, drop=False)
+    RESULTS.replace(
+        {"area": COUNTER_LINE_NAMES[args.station]},
+        inplace=True)
+    RESULTS = RESULTS.groupby(['movie_file', 'area']).sum()
+    RESULTS.reset_index(inplace=True, drop=False)
+    # if args.station == "citylab":
+    #     RESULTS.drop("area", axis=1, inplace=True)  # direction already unique
+    #     FINAL_COLS = [c for c in FINAL_COLS if c != "area"]
+    # elif args.station == "ecdf":
+    #     RESULTS.replace(
+    #         {"area": COUNTER_LINE_NAMES["ecdf"]},
+    #         inplace=True)
+    #         RESULTS = RESULTS.groupby(['movie_file', 'area']).sum()
+    #         RESULTS.reset_index(inplace=True, drop=False)
 
     """random sampling of data"""
     print(len(RESULTS))

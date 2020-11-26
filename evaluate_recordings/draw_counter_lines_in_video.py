@@ -29,7 +29,9 @@ if __name__ == '__main__':
     if args.station == "citylab" and args.board == "tx2":
         scaling_factor_x = 640 / 1440
         scaling_factor_y = 360 / 815
-        line_location = COUNTER_LINE_COORDS[args.station]
+        #line_location = COUNTER_LINE_COORDS[args.station]
+        line_area = df[df["row_number"] == args.row]['area'].values[0]
+        line_location = COUNTER_LINE_COORDS[args.station][line_area]
 
     else:  # args.station == "ecdf" and args.board == "xavier":
         scaling_factor_x = 640 / 1356  # 1189
